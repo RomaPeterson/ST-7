@@ -11,6 +11,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -32,11 +34,8 @@ jobs:
           echo "Chrome full version: $CHROME_FULL_VERSION"
           CHROME_MAJOR=$(echo $CHROME_FULL_VERSION | cut -d'.' -f1)
           echo "Chrome major: $CHROME_MAJOR"
-          
-          # Получаем актуальную версию ChromeDriver для этой major-версии
           DRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_MAJOR}")
           echo "ChromeDriver version: $DRIVER_VERSION"
-          
           wget -q "https://storage.googleapis.com/chrome-for-testing-public/${DRIVER_VERSION}/linux64/chromedriver-linux64.zip"
           unzip -q chromedriver-linux64.zip
           sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
@@ -51,8 +50,9 @@ jobs:
 
       - name: Commit forecast result
         run: |
+          git checkout main
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add result/forecast.txt
           git diff --quiet && git diff --staged --quiet || git commit -m "Update forecast.txt"
-          git push
+          git push origin main
