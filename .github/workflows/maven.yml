@@ -49,3 +49,4 @@ jobs:
           git add result/forecast.txt
           git diff --quiet && git diff --staged --quiet || git commit -m "Update forecast.txt"
           git push
+ 
